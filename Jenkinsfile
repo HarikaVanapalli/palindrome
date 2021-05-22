@@ -1,21 +1,21 @@
 pipeline {
-environment { 
-       reg = "harika9391/palindrome" 
-	   registryCredential = 'docker_id' 
-       dockerImage = '' 
+environment {
+       reg = "harika9391/palindrome"
+	   registryCredential = 'docker_id'
+       dockerImage = ''
     }
     agent any
-    stages { 
+    stages {
 
-        stage('Cloning our Git') { 
+        stage('Cloning our Git repo') {
 
-            steps { 
+            steps {
 
                 git 'https://github.com/HarikaVanapalli/palindrome.git'
             }
 
-        } 
-        
+        }
+
          stage("java compile") {
             steps {
                 sh '''
@@ -25,47 +25,55 @@ environment {
             }
         }
          stage('Java pacakge') {
-         
+
          steps {
           sh 'jar cfe Palindrome.jar Palindrome *.class'
          }
 	   }
-	   
+
         stage('Docker image build') {
-          
+
 		  steps {
-            script { 
-                    dockerImage = docker.build reg + ":$BUILD_NUMBER" 
+            script {
+                    dockerImage = docker.build reg + ":$BUILD_NUMBER"
                 }
 		    }
          }
-		 
-		 stage('Deploy our image') { 
 
-            steps { 
+		 stage('Deploy our image') {
 
-                script { 
+            steps {
 
-                    docker.withRegistry( '', registryCredential ) { 
+                script {
 
-                        dockerImage.push() 
+                    docker.withRegistry( '', registryCredential ) {
+
+                        dockerImage.push()
                     }
 
-                } 
+                }
 
             }
 
-        } 
+        }
 
-        stage('Cleaning up') { 
+        stage('Cleaning up') {
 
-            steps { 
+            steps {
 
-                sh "docker rmi $reg:$BUILD_NUMBER" 
+                sh "docker rmi $reg:$BUILD_NUMBER"
 
             }
 
-        } 
+        }
+        stage('Cleaning up') {
+
+            steps {
+
+                sh "docker rmi $reg:$BUILD_NUMBER"
+
+            }
+        }
 
     }
 
